@@ -115,7 +115,7 @@ tailwind.config = {
           <p class="text-sm text-on-surface-variant mb-6 text-center">PDF or DOCX. Up to 50 files per batch.</p>
           <button class="px-6 py-2.5 bg-surface-container-highest text-on-surface font-medium rounded-lg hover:bg-surface-dim transition-colors text-sm">Select Files from Disk</button>
         </div>
-        <input type="file" id="resume-input" multiple accept=".pdf,.docx,.doc" class="hidden" onchange="handleFiles(this.files)"/>
+        <input type="file" id="resume-input" multiple accept=".pdf,.docx,.doc" class="hidden" onchange="addFiles(this.files)"/>
         <div id="file-chips" class="mt-4 flex flex-wrap gap-2"></div>
       </section>
     </div>
@@ -259,10 +259,14 @@ tailwind.config = {
   // ── State ──
   let uploadedFiles = [];
   let resultsData = [];
-
   // ── File handling ──
+function addFiles(files) {
+    const newFiles = Array.from(files);
+    uploadedFiles = [...uploadedFiles, ...newFiles];
+    handleFiles(uploadedFiles);
+}
   function handleFiles(files) {
-    uploadedFiles = Array.from(files);
+    uploadedFiles = Array.isArray(files) ? files : Array.from(files);
     document.getElementById('file-count').textContent = `${uploadedFiles.length} candidate${uploadedFiles.length !== 1 ? 's' : ''} added`;
     const chips = document.getElementById('file-chips');
     chips.innerHTML = '';
