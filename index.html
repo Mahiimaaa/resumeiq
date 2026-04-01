@@ -1,0 +1,447 @@
+<!DOCTYPE html>
+<html class="light" lang="en">
+<head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>ResumeIQ</title>
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
+<script id="tailwind-config">
+tailwind.config = {
+  darkMode: "class",
+  theme: {
+    extend: {
+      colors: {
+        "tertiary": "#635e59","error": "#9f403d","secondary-container": "#ffdcc1",
+        "on-background": "#32332d","on-primary": "#faf7f6","on-secondary": "#fff7f4",
+        "on-primary-fixed-variant": "#5c5b5b","surface-container-high": "#eae8e1",
+        "primary-container": "#e5e2e1","background": "#fcf9f5","primary": "#5f5e5e",
+        "surface-dim": "#dbdad1","tertiary-container": "#faf2eb","surface": "#fcf9f5",
+        "on-primary-container": "#525151","on-tertiary-container": "#5f5b56",
+        "error-container": "#fe8983","outline": "#7b7b74","secondary-fixed": "#ffdcc1",
+        "surface-container-low": "#f6f3ee","surface-container-lowest": "#ffffff",
+        "primary-fixed": "#e5e2e1","tertiary-dim": "#56524d","tertiary-fixed-dim": "#ebe4dd",
+        "on-secondary-fixed-variant": "#874d0e","primary-dim": "#535252",
+        "inverse-primary": "#ffffff","on-surface-variant": "#5f5f59",
+        "on-primary-fixed": "#403f3f","surface-variant": "#e4e3da","on-tertiary": "#fff8f0",
+        "on-error-container": "#752121","on-secondary-fixed": "#613400",
+        "on-tertiary-fixed": "#4d4944","surface-container": "#f0eee8",
+        "surface-tint": "#5f5e5e","error-dim": "#4e0309","inverse-on-surface": "#9e9d99",
+        "tertiary-fixed": "#faf2eb","outline-variant": "#b3b2ab","secondary-dim": "#7d4504",
+        "on-secondary-container": "#7b4403","primary-fixed-dim": "#d6d4d3",
+        "inverse-surface": "#0e0e0c","on-surface": "#32332d",
+        "surface-container-highest": "#e4e3da","secondary-fixed-dim": "#ffca9e",
+        "on-tertiary-fixed-variant": "#6a6560","on-error": "#fff7f6",
+        "surface-bright": "#fcf9f5","secondary": "#8b5112"
+      },
+      fontFamily: { "headline": ["Inter"], "body": ["Inter"], "label": ["Inter"] },
+      borderRadius: { "DEFAULT": "0.125rem","lg": "0.25rem","xl": "0.5rem","full": "0.75rem","card": "10px","btn": "8px" },
+    },
+  },
+}
+</script>
+<style>
+  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
+  body { font-family: 'Inter', sans-serif; background-color: #fcf9f5; color: #32332d; }
+  .alternate-row:nth-child(even) { background-color: #FAF8F5; }
+  .page { display: none; }
+  .page.active { display: block; }
+  #progress-bar { transition: width 0.5s ease-in-out; }
+</style>
+</head>
+<body class="min-h-screen">
+
+<!-- ─────────────────── SIDEBAR (shared) ─────────────────── -->
+<aside id="sidebar" class="h-screen w-64 fixed left-0 top-0 bg-[#f6f3ee] flex flex-col p-4 space-y-2 z-10">
+  <div class="px-4 py-6">
+    <h1 class="text-xl font-extrabold tracking-tighter text-[#1A1A1A] mb-1">ResumeIQ</h1>
+    <p class="text-[0.7rem] uppercase tracking-[0.1em] text-[#5f5f59] font-semibold">Editorial Curator Mode</p>
+  </div>
+  <nav class="flex-1 space-y-1">
+    <a class="flex items-center space-x-3 px-4 py-3 text-[#5f5f59] hover:bg-[#eae8e1] rounded-lg transition-colors" href="#">
+      <span class="material-symbols-outlined">dashboard</span><span class="font-medium text-sm">Dashboard</span>
+    </a>
+    <a class="flex items-center space-x-3 px-4 py-3 text-[#1A1A1A] bg-white rounded-lg shadow-sm font-semibold" href="#">
+      <span class="material-symbols-outlined">group</span><span class="font-medium text-sm">Candidates</span>
+    </a>
+    <a class="flex items-center space-x-3 px-4 py-3 text-[#5f5f59] hover:bg-[#eae8e1] rounded-lg transition-colors" href="#">
+      <span class="material-symbols-outlined">description</span><span class="font-medium text-sm">Job Posts</span>
+    </a>
+    <a class="flex items-center space-x-3 px-4 py-3 text-[#5f5f59] hover:bg-[#eae8e1] rounded-lg transition-colors" href="#">
+      <span class="material-symbols-outlined">analytics</span><span class="font-medium text-sm">Analytics</span>
+    </a>
+  </nav>
+  <div class="pt-4 border-t border-outline-variant/10">
+    <a class="flex items-center space-x-3 px-4 py-3 text-[#5f5f59] hover:bg-[#eae8e1] rounded-lg transition-colors" href="#">
+      <span class="material-symbols-outlined">help_outline</span><span class="font-medium text-sm">Support</span>
+    </a>
+  </div>
+</aside>
+
+<!-- ─────────────────── PAGE 1: UPLOAD ─────────────────── -->
+<div id="page-upload" class="page active ml-64 min-h-screen">
+  <main class="p-8">
+    <header class="flex justify-between items-center w-full h-16 mb-8">
+      <div>
+        <h2 class="text-2xl font-semibold text-[#1A1A1A] tracking-tight">New Screening Batch</h2>
+        <p class="text-sm text-on-surface-variant">Define requirements and upload candidate resumes.</p>
+      </div>
+      <div class="flex items-center space-x-3">
+        <span class="material-symbols-outlined text-[#5f5f59] p-2 rounded-full cursor-pointer hover:bg-[#f6f3ee]">notifications</span>
+        <span class="material-symbols-outlined text-[#5f5f59] p-2 rounded-full cursor-pointer hover:bg-[#f6f3ee]">settings</span>
+      </div>
+    </header>
+
+    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
+      <!-- Left: JD -->
+      <section class="bg-white rounded-card p-8 flex flex-col min-h-[500px] border border-[#E2DDD8]">
+        <h2 class="text-xl font-medium text-on-surface mb-6">Job Description</h2>
+        <label class="text-[0.6875rem] font-medium tracking-[0.05em] text-on-surface-variant uppercase mb-2">Position Requirements</label>
+        <textarea id="jd-text" class="w-full flex-grow bg-surface-container-low border-none focus:ring-2 focus:ring-secondary/20 rounded-xl p-6 text-on-surface placeholder:text-outline/50 resize-none leading-relaxed" placeholder="Paste the full job description here. Include essential skills, required experience, and key performance indicators..."></textarea>
+      </section>
+
+      <!-- Right: Resumes -->
+      <section class="bg-white rounded-card p-8 flex flex-col min-h-[500px] border border-[#E2DDD8]">
+        <div class="flex justify-between items-center mb-6">
+          <h2 class="text-xl font-medium text-on-surface">Resumes</h2>
+          <span id="file-count" class="text-sm text-on-surface-variant">0 candidates added</span>
+        </div>
+        <div id="drop-zone" class="flex-grow border-2 border-dashed border-outline-variant/30 rounded-xl flex flex-col items-center justify-center p-12 hover:border-secondary/30 hover:bg-surface-container-low transition-all duration-300 cursor-pointer" onclick="document.getElementById('resume-input').click()">
+          <div class="bg-surface-container-low p-5 rounded-full mb-4">
+            <span class="material-symbols-outlined text-secondary" style="font-size:32px">upload_file</span>
+          </div>
+          <p class="text-lg font-medium text-on-surface mb-1">Drag and drop resumes</p>
+          <p class="text-sm text-on-surface-variant mb-6 text-center">PDF or DOCX. Up to 50 files per batch.</p>
+          <button class="px-6 py-2.5 bg-surface-container-highest text-on-surface font-medium rounded-lg hover:bg-surface-dim transition-colors text-sm">Select Files from Disk</button>
+        </div>
+        <input type="file" id="resume-input" multiple accept=".pdf,.docx,.doc" class="hidden" onchange="handleFiles(this.files)"/>
+        <div id="file-chips" class="mt-4 flex flex-wrap gap-2"></div>
+      </section>
+    </div>
+
+    <!-- Error message -->
+    <div id="upload-error" class="hidden mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"></div>
+
+    <!-- Analyze Button -->
+    <div class="mt-8">
+      <button id="analyze-btn" onclick="startAnalysis()" class="w-full py-5 bg-[#1A1A1A] text-white font-semibold rounded-card text-lg hover:bg-[#32332d] transition-all duration-300 active:scale-[0.99] flex items-center justify-center gap-3">
+        Analyze Resumes
+        <span class="material-symbols-outlined text-white">auto_awesome</span>
+      </button>
+      <div class="mt-6 flex items-center justify-center gap-8">
+        <div class="flex items-center gap-2 text-on-surface-variant text-sm">
+          <span class="material-symbols-outlined text-secondary">verified_user</span>Privacy-first AI screening
+        </div>
+        <div class="flex items-center gap-2 text-on-surface-variant text-sm">
+          <span class="material-symbols-outlined text-secondary">timer</span>Est. processing time: ~45 seconds
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ─────────────────── PAGE 2: ANALYZING ─────────────────── -->
+<div id="page-analyzing" class="page ml-64 min-h-screen">
+  <main class="p-8 flex flex-col items-center justify-center min-h-screen">
+    <div class="w-full max-w-4xl space-y-12">
+      <div>
+        <span class="text-[0.6875rem] uppercase tracking-[0.15em] text-secondary font-semibold">Current Operation</span>
+        <h2 class="text-3xl font-medium tracking-tighter text-on-surface mt-2">Analyzing Talent Pool</h2>
+      </div>
+      <div class="bg-white rounded-xl p-12 border border-[#E2DDD8] text-center space-y-6">
+        <div class="space-y-3">
+          <p id="progress-label" class="text-on-surface-variant font-medium text-sm tracking-tight">Preparing resumes...</p>
+          <div class="w-full max-w-md mx-auto h-1.5 bg-surface-container-high rounded-full overflow-hidden">
+            <div id="progress-bar" class="h-full bg-secondary rounded-full" style="width: 5%"></div>
+          </div>
+        </div>
+        <div class="flex justify-center items-center space-x-12 pt-4">
+          <div class="text-left">
+            <p class="text-xs uppercase tracking-wider text-on-surface-variant opacity-60">Files</p>
+            <p id="file-total-display" class="text-2xl font-medium text-on-surface">0</p>
+          </div>
+          <div class="h-8 w-px bg-outline-variant/20"></div>
+          <div class="text-left">
+            <p class="text-xs uppercase tracking-wider text-on-surface-variant opacity-60">Status</p>
+            <p class="text-2xl font-medium text-on-surface">Processing</p>
+          </div>
+        </div>
+      </div>
+      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+        <div class="bg-surface-container-low/50 rounded-lg p-6 border border-outline-variant/10">
+          <div class="flex items-center justify-between mb-4">
+            <span class="material-symbols-outlined text-secondary opacity-40">psychology</span>
+            <span class="text-[0.625rem] font-bold text-secondary uppercase tracking-widest">Active Insight</span>
+          </div>
+          <p class="text-sm leading-relaxed text-on-surface-variant">Cross-referencing skills with stated proficiency levels...</p>
+        </div>
+        <div class="bg-surface-container-low/50 rounded-lg p-6 border border-outline-variant/10">
+          <div class="flex items-center justify-between mb-4">
+            <span class="material-symbols-outlined text-secondary opacity-40">verified_user</span>
+            <span class="text-[0.625rem] font-bold text-secondary uppercase tracking-widest">Validation</span>
+          </div>
+          <p class="text-sm leading-relaxed text-on-surface-variant">Validating employment history against industry benchmarks.</p>
+        </div>
+        <div class="bg-surface-container-low/50 rounded-lg p-6 border border-outline-variant/10">
+          <div class="flex items-center justify-between mb-4">
+            <span class="material-symbols-outlined text-secondary opacity-40">auto_awesome</span>
+            <span class="text-[0.625rem] font-bold text-secondary uppercase tracking-widest">Scoring</span>
+          </div>
+          <p class="text-sm leading-relaxed text-on-surface-variant">Generating match scores and reasoning for each candidate.</p>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- ─────────────────── PAGE 3: RESULTS ─────────────────── -->
+<div id="page-results" class="page ml-64 min-h-screen">
+  <main class="p-8">
+    <header class="flex justify-between items-center w-full h-16 mb-8">
+      <div>
+        <h2 class="text-2xl font-semibold text-[#1A1A1A] tracking-tight">Screening Results</h2>
+        <p id="results-subtitle" class="text-sm text-on-surface-variant"></p>
+      </div>
+      <div class="flex items-center space-x-4">
+        <button onclick="resetApp()" class="px-4 py-2 text-sm font-medium text-[#5f5f59] hover:bg-[#f6f3ee] rounded-lg transition-colors flex items-center gap-2">
+          <span class="material-symbols-outlined text-base">arrow_back</span> New Batch
+        </button>
+      </div>
+    </header>
+
+    <!-- Stats -->
+    <div class="grid grid-cols-4 gap-4 mb-8">
+      <div class="bg-white p-5 rounded-card border border-[#E2DDD8] flex flex-col">
+        <span class="text-[0.6875rem] uppercase tracking-[0.05em] text-[#8A857F] font-bold mb-1">TOTAL</span>
+        <span id="stat-total" class="text-2xl font-bold text-[#1A1A1A]">0</span>
+      </div>
+      <div class="bg-white p-5 rounded-card border border-[#E2DDD8] flex flex-col">
+        <span class="text-[0.6875rem] uppercase tracking-[0.05em] text-[#8A857F] font-bold mb-1">STRONG</span>
+        <span id="stat-strong" class="text-2xl font-bold text-[#2D6A4F]">0</span>
+      </div>
+      <div class="bg-white p-5 rounded-card border border-[#E2DDD8] flex flex-col">
+        <span class="text-[0.6875rem] uppercase tracking-[0.05em] text-[#8A857F] font-bold mb-1">PARTIAL</span>
+        <span id="stat-partial" class="text-2xl font-bold text-[#92400E]">0</span>
+      </div>
+      <div class="bg-white p-5 rounded-card border border-[#E2DDD8] flex flex-col">
+        <span class="text-[0.6875rem] uppercase tracking-[0.05em] text-[#8A857F] font-bold mb-1">WEAK</span>
+        <span id="stat-weak" class="text-2xl font-bold text-[#7F1D1D]">0</span>
+      </div>
+    </div>
+
+    <!-- Results Table -->
+    <div class="bg-white rounded-card border border-[#E2DDD8] overflow-hidden">
+      <table class="w-full text-left border-collapse">
+        <thead>
+          <tr class="bg-surface-container-low border-b border-[#E2DDD8]">
+            <th class="px-6 py-4 text-[0.6875rem] uppercase tracking-[0.05em] font-bold text-[#8A857F]">Rank</th>
+            <th class="px-6 py-4 text-[0.6875rem] uppercase tracking-[0.05em] font-bold text-[#8A857F]">Candidate</th>
+            <th class="px-6 py-4 text-[0.6875rem] uppercase tracking-[0.05em] font-bold text-[#8A857F]">Score</th>
+            <th class="px-6 py-4 text-[0.6875rem] uppercase tracking-[0.05em] font-bold text-[#8A857F]">AI Reason</th>
+            <th class="px-6 py-4 text-[0.6875rem] uppercase tracking-[0.05em] font-bold text-[#8A857F]">Match</th>
+          </tr>
+        </thead>
+        <tbody id="results-tbody" class="divide-y divide-[#E2DDD8]/50"></tbody>
+      </table>
+      <div class="p-6 bg-surface-container-low flex items-center justify-between">
+        <span id="results-count" class="text-xs text-[#8A857F]"></span>
+        <div class="flex items-center space-x-4">
+          <button onclick="exportCSV()" class="px-5 py-2.5 rounded-btn text-sm font-medium text-[#1A1A1A] hover:bg-[#e4e3da] transition-colors border border-[#E2DDD8]">Export CSV</button>
+          <button class="px-5 py-2.5 rounded-btn text-sm font-semibold bg-[#1A1A1A] text-white hover:bg-black transition-colors">Shortlist top 8</button>
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<script>
+  // ── State ──
+  let uploadedFiles = [];
+  let resultsData = [];
+
+  // ── File handling ──
+  function handleFiles(files) {
+    uploadedFiles = Array.from(files);
+    document.getElementById('file-count').textContent = `${uploadedFiles.length} candidate${uploadedFiles.length !== 1 ? 's' : ''} added`;
+    const chips = document.getElementById('file-chips');
+    chips.innerHTML = '';
+    uploadedFiles.forEach((f, i) => {
+      chips.innerHTML += `
+        <div class="bg-surface-container-low px-3 py-2 rounded-lg flex items-center gap-2 border border-outline-variant/10">
+          <span class="material-symbols-outlined text-sm text-secondary">description</span>
+          <span class="text-xs font-medium truncate max-w-[120px]">${f.name}</span>
+          <button onclick="removeFile(${i})" class="hover:text-error transition-colors">
+            <span class="material-symbols-outlined" style="font-size:14px">close</span>
+          </button>
+        </div>`;
+    });
+  }
+
+  function removeFile(index) {
+    uploadedFiles.splice(index, 1);
+    handleFiles(uploadedFiles);
+  }
+
+  // Drag and drop
+  const dropZone = document.getElementById('drop-zone');
+  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('border-secondary/50', 'bg-surface-container-low'); });
+  dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('border-secondary/50', 'bg-surface-container-low'); });
+  dropZone.addEventListener('drop', e => {
+    e.preventDefault();
+    dropZone.classList.remove('border-secondary/50', 'bg-surface-container-low');
+    handleFiles(e.dataTransfer.files);
+  });
+
+  // ── Page navigation ──
+  function showPage(name) {
+    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+    document.getElementById(`page-${name}`).classList.add('active');
+  }
+
+  // ── Start analysis ──
+  async function startAnalysis() {
+    const jdText = document.getElementById('jd-text').value.trim();
+    const errorEl = document.getElementById('upload-error');
+    errorEl.classList.add('hidden');
+
+    if (!jdText) { errorEl.textContent = 'Please paste a job description.'; errorEl.classList.remove('hidden'); return; }
+    if (uploadedFiles.length === 0) { errorEl.textContent = 'Please upload at least one resume.'; errorEl.classList.remove('hidden'); return; }
+
+    // Show analyzing page
+    document.getElementById('file-total-display').textContent = uploadedFiles.length;
+    showPage('analyzing');
+
+    // Animate progress bar
+    let progress = 5;
+    const progressBar = document.getElementById('progress-bar');
+    const progressLabel = document.getElementById('progress-label');
+    const interval = setInterval(() => {
+      if (progress < 85) {
+        progress += Math.random() * 8;
+        progressBar.style.width = Math.min(progress, 85) + '%';
+        if (progress > 30) progressLabel.textContent = 'Extracting resume text...';
+        if (progress > 55) progressLabel.textContent = 'Scoring with Gemini AI...';
+        if (progress > 75) progressLabel.textContent = 'Ranking candidates...';
+      }
+    }, 800);
+
+    // Build form data
+    const formData = new FormData();
+    formData.append('jd_text', jdText);
+    uploadedFiles.forEach(f => formData.append('resumes', f));
+
+    try {
+      const response = await fetch('http://127.0.0.1:8000/analyze', {
+        method: 'POST',
+        body: formData
+      });
+
+      clearInterval(interval);
+      progressBar.style.width = '100%';
+      progressLabel.textContent = 'Done! Loading results...';
+
+      if (!response.ok) {
+        const err = await response.json();
+        throw new Error(err.detail || 'Server error');
+      }
+
+      const data = await response.json();
+      resultsData = data.results;
+
+      setTimeout(() => renderResults(data), 600);
+
+    } catch (err) {
+      clearInterval(interval);
+      showPage('upload');
+      document.getElementById('upload-error').textContent = `Error: ${err.message}. Make sure your backend is running at http://127.0.0.1:8000`;
+      document.getElementById('upload-error').classList.remove('hidden');
+    }
+  }
+
+  // ── Render results ──
+  function renderResults(data) {
+    // Stats
+    document.getElementById('stat-total').textContent = data.total;
+    document.getElementById('stat-strong').textContent = data.stats.strong;
+    document.getElementById('stat-partial').textContent = (data.stats.partial + data.stats.good);
+    document.getElementById('stat-weak').textContent = data.stats.weak;
+    document.getElementById('results-subtitle').textContent = `${data.total} candidates scored`;
+    document.getElementById('results-count').textContent = `Showing all ${data.total} candidates`;
+
+    // Table rows
+    const tbody = document.getElementById('results-tbody');
+    tbody.innerHTML = '';
+    data.results.forEach((r, i) => {
+      const isTop3 = i < 3;
+      const score = r.score || 0;
+      const scoreColor = score >= 80 ? '#2D6A4F' : score >= 55 ? '#92400E' : '#7F1D1D';
+      const badgeStyle = score >= 80
+        ? 'bg-[#2D6A4F]/10 text-[#2D6A4F]'
+        : score >= 55 ? 'bg-[#92400E]/10 text-[#92400E]' : 'bg-[#7F1D1D]/10 text-[#7F1D1D]';
+      const borderClass = isTop3 ? 'border-l-4 border-[#C17D3C]' : '';
+      const rankColor = isTop3 ? '#1A1A1A' : '#5f5f59';
+
+      tbody.innerHTML += `
+        <tr class="alternate-row ${borderClass}">
+          <td class="px-6 py-5 align-top">
+            <span class="text-lg font-bold" style="color:${rankColor}">${String(r.rank).padStart(2,'0')}</span>
+          </td>
+          <td class="px-6 py-5">
+            <div class="flex flex-col">
+              <span class="text-sm font-semibold text-[#1A1A1A]">${r.candidate_name}</span>
+              <span class="text-xs text-[#8A857F] mt-0.5">${r.experience_summary}</span>
+            </div>
+          </td>
+          <td class="px-6 py-5">
+            <div class="flex items-center space-x-3 w-32">
+              <div class="flex-1 h-1.5 bg-[#f0eee8] rounded-full overflow-hidden">
+                <div class="h-full rounded-full" style="width:${score}%;background:${scoreColor}"></div>
+              </div>
+              <span class="text-sm font-bold" style="color:${scoreColor}">${score}</span>
+            </div>
+          </td>
+          <td class="px-6 py-5 align-top max-w-md">
+            <p class="text-xs text-[#5f5f59] leading-relaxed line-clamp-2">${r.reason}</p>
+          </td>
+          <td class="px-6 py-5">
+            <span class="inline-flex px-2.5 py-1 rounded-full text-[0.65rem] font-bold uppercase tracking-wider ${badgeStyle}">${r.match_level}</span>
+          </td>
+        </tr>`;
+    });
+
+    showPage('results');
+  }
+
+  // ── Export CSV ──
+  function exportCSV() {
+    if (!resultsData.length) return;
+    const headers = ['Rank','Candidate','Experience','Score','Match Level','Reason','Matched Skills','Missing Skills'];
+    const rows = resultsData.map(r => [
+      r.rank, r.candidate_name, r.experience_summary, r.score,
+      r.match_level, `"${r.reason}"`,
+      `"${(r.matched_skills||[]).join(', ')}"`,
+      `"${(r.missing_skills||[]).join(', ')}"`
+    ]);
+    const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
+    const blob = new Blob([csv], { type: 'text/csv' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url; a.download = 'resumeiq_results.csv'; a.click();
+    URL.revokeObjectURL(url);
+  }
+
+  // ── Reset ──
+  function resetApp() {
+    uploadedFiles = [];
+    resultsData = [];
+    document.getElementById('jd-text').value = '';
+    document.getElementById('file-chips').innerHTML = '';
+    document.getElementById('file-count').textContent = '0 candidates added';
+    document.getElementById('upload-error').classList.add('hidden');
+    document.getElementById('progress-bar').style.width = '5%';
+    showPage('upload');
+  }
+</script>
+</body>
+</html>
