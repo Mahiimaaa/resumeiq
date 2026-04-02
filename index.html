@@ -1,451 +1,746 @@
 <!DOCTYPE html>
-<html class="light" lang="en">
+<html lang="en">
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
 <title>ResumeIQ</title>
-<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<script src="https://cdn.tailwindcss.com"></script>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet"/>
-<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:wght,FILL@100..700,0..1&display=swap" rel="stylesheet"/>
-<script id="tailwind-config">
-tailwind.config = {
-  darkMode: "class",
-  theme: {
-    extend: {
-      colors: {
-        "tertiary": "#635e59","error": "#9f403d","secondary-container": "#ffdcc1",
-        "on-background": "#32332d","on-primary": "#faf7f6","on-secondary": "#fff7f4",
-        "on-primary-fixed-variant": "#5c5b5b","surface-container-high": "#eae8e1",
-        "primary-container": "#e5e2e1","background": "#fcf9f5","primary": "#5f5e5e",
-        "surface-dim": "#dbdad1","tertiary-container": "#faf2eb","surface": "#fcf9f5",
-        "on-primary-container": "#525151","on-tertiary-container": "#5f5b56",
-        "error-container": "#fe8983","outline": "#7b7b74","secondary-fixed": "#ffdcc1",
-        "surface-container-low": "#f6f3ee","surface-container-lowest": "#ffffff",
-        "primary-fixed": "#e5e2e1","tertiary-dim": "#56524d","tertiary-fixed-dim": "#ebe4dd",
-        "on-secondary-fixed-variant": "#874d0e","primary-dim": "#535252",
-        "inverse-primary": "#ffffff","on-surface-variant": "#5f5f59",
-        "on-primary-fixed": "#403f3f","surface-variant": "#e4e3da","on-tertiary": "#fff8f0",
-        "on-error-container": "#752121","on-secondary-fixed": "#613400",
-        "on-tertiary-fixed": "#4d4944","surface-container": "#f0eee8",
-        "surface-tint": "#5f5e5e","error-dim": "#4e0309","inverse-on-surface": "#9e9d99",
-        "tertiary-fixed": "#faf2eb","outline-variant": "#b3b2ab","secondary-dim": "#7d4504",
-        "on-secondary-container": "#7b4403","primary-fixed-dim": "#d6d4d3",
-        "inverse-surface": "#0e0e0c","on-surface": "#32332d",
-        "surface-container-highest": "#e4e3da","secondary-fixed-dim": "#ffca9e",
-        "on-tertiary-fixed-variant": "#6a6560","on-error": "#fff7f6",
-        "surface-bright": "#fcf9f5","secondary": "#8b5112"
-      },
-      fontFamily: { "headline": ["Inter"], "body": ["Inter"], "label": ["Inter"] },
-      borderRadius: { "DEFAULT": "0.125rem","lg": "0.25rem","xl": "0.5rem","full": "0.75rem","card": "10px","btn": "8px" },
-    },
-  },
-}
-</script>
+<link href="https://fonts.googleapis.com/css2?family=Material+Symbols+Outlined:opsz,wght,FILL,GRAD@24,400,0,0" rel="stylesheet"/>
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <style>
-  .material-symbols-outlined { font-variation-settings: 'FILL' 0, 'wght' 400, 'GRAD' 0, 'opsz' 24; }
-  body { font-family: 'Inter', sans-serif; background-color: #fcf9f5; color: #32332d; }
-  .alternate-row:nth-child(even) { background-color: #FAF8F5; }
+  * { font-family: 'Inter', sans-serif; }
+  body { background: #fcf9f5; color: #1A1A1A; }
   .page { display: none; }
-  .page.active { display: block; }
+  .page.active { display: flex; }
   #progress-bar { transition: width 0.5s ease-in-out; }
+
+  /* Sidebar */
+  .sidebar { width: 220px; min-width: 220px; background: #fff; border-right: 1px solid #E2DDD8; display: flex; flex-direction: column; height: 100vh; position: sticky; top: 0; }
+  .nav-link { display: flex; align-items: center; gap: 10px; padding: 9px 12px; border-radius: 6px; color: #8A857F; font-size: 13px; font-weight: 500; text-decoration: none; cursor: pointer; transition: background 0.15s, color 0.15s; margin-bottom: 2px; }
+  .nav-link:hover { background: #f4ede4; color: #1A1A1A; }
+  .nav-link.active { background: #f4ede4; color: #1A1A1A; font-weight: 600; }
+  .nav-link svg { flex-shrink: 0; }
+
+  /* Cards */
+  .card { background: #fff; border: 1px solid #E2DDD8; border-radius: 10px; }
+
+  /* Stat chip */
+  .badge-strong { background: #f0faf5; color: #2D6A4F; }
+  .badge-good   { background: #fffbeb; color: #92400E; }
+  .badge-partial{ background: #fff7ed; color: #92400E; }
+  .badge-weak   { background: #fff1f1; color: #7F1D1D; }
+
+  /* Table */
+  .alt-row:nth-child(even) { background: #faf8f5; }
+
+  /* Login card */
+  input:focus { outline: none; border-color: #8b5112 !important; }
+
+  /* Scrollable main */
+  .main-scroll { flex: 1; overflow-y: auto; height: 100vh; }
 </style>
 </head>
 <body class="min-h-screen">
 
-<!-- ─────────────────── SIDEBAR (shared) ─────────────────── -->
-<aside id="sidebar" class="h-screen w-64 fixed left-0 top-0 bg-[#f6f3ee] flex flex-col p-4 space-y-2 z-10">
-  <div class="px-4 py-6">
-    <h1 class="text-xl font-extrabold tracking-tighter text-[#1A1A1A] mb-1">ResumeIQ</h1>
-    <p class="text-[0.7rem] uppercase tracking-[0.1em] text-[#5f5f59] font-semibold">Editorial Curator Mode</p>
-  </div>
-  <nav class="flex-1 space-y-1">
-    <a class="flex items-center space-x-3 px-4 py-3 text-[#5f5f59] hover:bg-[#eae8e1] rounded-lg transition-colors" href="#">
-      <span class="material-symbols-outlined">dashboard</span><span class="font-medium text-sm">Dashboard</span>
-    </a>
-    <a class="flex items-center space-x-3 px-4 py-3 text-[#1A1A1A] bg-white rounded-lg shadow-sm font-semibold" href="#">
-      <span class="material-symbols-outlined">group</span><span class="font-medium text-sm">Candidates</span>
-    </a>
-    <a class="flex items-center space-x-3 px-4 py-3 text-[#5f5f59] hover:bg-[#eae8e1] rounded-lg transition-colors" href="#">
-      <span class="material-symbols-outlined">description</span><span class="font-medium text-sm">Job Posts</span>
-    </a>
-    <a class="flex items-center space-x-3 px-4 py-3 text-[#5f5f59] hover:bg-[#eae8e1] rounded-lg transition-colors" href="#">
-      <span class="material-symbols-outlined">analytics</span><span class="font-medium text-sm">Analytics</span>
-    </a>
-  </nav>
-  <div class="pt-4 border-t border-outline-variant/10">
-    <a class="flex items-center space-x-3 px-4 py-3 text-[#5f5f59] hover:bg-[#eae8e1] rounded-lg transition-colors" href="#">
-      <span class="material-symbols-outlined">help_outline</span><span class="font-medium text-sm">Support</span>
-    </a>
-  </div>
-</aside>
-
-<!-- ─────────────────── PAGE 1: UPLOAD ─────────────────── -->
-<div id="page-upload" class="page active ml-64 min-h-screen">
-  <main class="p-8">
-    <header class="flex justify-between items-center w-full h-16 mb-8">
-      <div>
-        <h2 class="text-2xl font-semibold text-[#1A1A1A] tracking-tight">New Screening Batch</h2>
-        <p class="text-sm text-on-surface-variant">Define requirements and upload candidate resumes.</p>
-      </div>
-      <div class="flex items-center space-x-3">
-        <span class="material-symbols-outlined text-[#5f5f59] p-2 rounded-full cursor-pointer hover:bg-[#f6f3ee]">notifications</span>
-        <span class="material-symbols-outlined text-[#5f5f59] p-2 rounded-full cursor-pointer hover:bg-[#f6f3ee]">settings</span>
-      </div>
-    </header>
-
-    <div class="grid grid-cols-1 lg:grid-cols-2 gap-8 items-stretch">
-      <!-- Left: JD -->
-      <section class="bg-white rounded-card p-8 flex flex-col min-h-[500px] border border-[#E2DDD8]">
-        <h2 class="text-xl font-medium text-on-surface mb-6">Job Description</h2>
-        <label class="text-[0.6875rem] font-medium tracking-[0.05em] text-on-surface-variant uppercase mb-2">Position Requirements</label>
-        <textarea id="jd-text" class="w-full flex-grow bg-surface-container-low border-none focus:ring-2 focus:ring-secondary/20 rounded-xl p-6 text-on-surface placeholder:text-outline/50 resize-none leading-relaxed" placeholder="Paste the full job description here. Include essential skills, required experience, and key performance indicators..."></textarea>
-      </section>
-
-      <!-- Right: Resumes -->
-      <section class="bg-white rounded-card p-8 flex flex-col min-h-[500px] border border-[#E2DDD8]">
-        <div class="flex justify-between items-center mb-6">
-          <h2 class="text-xl font-medium text-on-surface">Resumes</h2>
-          <span id="file-count" class="text-sm text-on-surface-variant">0 candidates added</span>
+<!-- ══════════════════════════════════════════
+     PAGE: LOGIN  (no sidebar)
+══════════════════════════════════════════ -->
+<div id="page-login" class="page active" style="min-height:100vh; background:#fcf9f5; justify-content:center; align-items:center; padding:24px;">
+  <div style="width:100%; max-width:420px;">
+    <!-- Brand -->
+    <div style="text-align:center; margin-bottom:36px;">
+      <div style="display:inline-flex; align-items:center; gap:10px; margin-bottom:10px;">
+        <div style="width:36px;height:36px;background:#1A1A1A;border-radius:8px;display:flex;align-items:center;justify-content:center;">
+          <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#fcf9f5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
         </div>
-        <div id="drop-zone" class="flex-grow border-2 border-dashed border-outline-variant/30 rounded-xl flex flex-col items-center justify-center p-12 hover:border-secondary/30 hover:bg-surface-container-low transition-all duration-300 cursor-pointer" onclick="document.getElementById('resume-input').click()">
-          <div class="bg-surface-container-low p-5 rounded-full mb-4">
-            <span class="material-symbols-outlined text-secondary" style="font-size:32px">upload_file</span>
-          </div>
-          <p class="text-lg font-medium text-on-surface mb-1">Drag and drop resumes</p>
-          <p class="text-sm text-on-surface-variant mb-6 text-center">PDF or DOCX. Up to 50 files per batch.</p>
-          <button class="px-6 py-2.5 bg-surface-container-highest text-on-surface font-medium rounded-lg hover:bg-surface-dim transition-colors text-sm">Select Files from Disk</button>
-        </div>
-        <input type="file" id="resume-input" multiple accept=".pdf,.docx,.doc" class="hidden" onchange="addFiles(this.files)"/>
-        <div id="file-chips" class="mt-4 flex flex-wrap gap-2"></div>
-      </section>
+        <span style="font-size:22px;font-weight:800;color:#1A1A1A;letter-spacing:-0.5px;">ResumeIQ</span>
+      </div>
+      <p style="font-size:14px;color:#8A857F;margin:0;">Screen smarter, hire faster.</p>
     </div>
+    <!-- Card -->
+    <div class="card" style="padding:36px;">
+      <h2 style="font-size:20px;font-weight:700;color:#1A1A1A;margin:0 0 4px;">Welcome back</h2>
+      <p style="font-size:13px;color:#8A857F;margin:0 0 28px;">Sign in to your ResumeIQ account</p>
 
-    <!-- Error message -->
-    <div id="upload-error" class="hidden mt-4 p-4 bg-red-50 border border-red-200 rounded-lg text-red-700 text-sm"></div>
-
-    <!-- Analyze Button -->
-    <div class="mt-8">
-      <button id="analyze-btn" onclick="startAnalysis()" class="w-full py-5 bg-[#1A1A1A] text-white font-semibold rounded-card text-lg hover:bg-[#32332d] transition-all duration-300 active:scale-[0.99] flex items-center justify-center gap-3">
-        Analyze Resumes
-        <span class="material-symbols-outlined text-white">auto_awesome</span>
+      <!-- Google -->
+      <button onclick="handleGoogleLogin()" style="width:100%;display:flex;align-items:center;justify-content:center;gap:10px;padding:11px 16px;border:1px solid #E2DDD8;border-radius:8px;background:#fff;cursor:pointer;font-size:14px;font-weight:500;color:#1A1A1A;margin-bottom:20px;" onmouseover="this.style.background='#fcf9f5'" onmouseout="this.style.background='#fff'">
+        <svg width="17" height="17" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+        Continue with Google
       </button>
-      <div class="mt-6 flex items-center justify-center gap-8">
-        <div class="flex items-center gap-2 text-on-surface-variant text-sm">
-          <span class="material-symbols-outlined text-secondary">verified_user</span>Privacy-first AI screening
+
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:20px;">
+        <div style="flex:1;height:1px;background:#E2DDD8;"></div>
+        <span style="font-size:12px;color:#8A857F;">or</span>
+        <div style="flex:1;height:1px;background:#E2DDD8;"></div>
+      </div>
+
+      <div style="margin-bottom:16px;">
+        <label style="font-size:13px;font-weight:500;color:#1A1A1A;display:block;margin-bottom:6px;">Email</label>
+        <input id="login-email" type="email" placeholder="you@company.com" style="width:100%;padding:10px 12px;border:1px solid #E2DDD8;border-radius:8px;font-size:14px;background:#fcf9f5;box-sizing:border-box;transition:border-color 0.15s;"/>
+      </div>
+      <div style="margin-bottom:24px;">
+        <div style="display:flex;justify-content:space-between;margin-bottom:6px;">
+          <label style="font-size:13px;font-weight:500;color:#1A1A1A;">Password</label>
+          <a href="#" style="font-size:12px;color:#8b5112;text-decoration:none;">Forgot password?</a>
         </div>
-        <div class="flex items-center gap-2 text-on-surface-variant text-sm">
-          <span class="material-symbols-outlined text-secondary">timer</span>Est. processing time: ~45 seconds
+        <input id="login-password" type="password" placeholder="••••••••" style="width:100%;padding:10px 12px;border:1px solid #E2DDD8;border-radius:8px;font-size:14px;background:#fcf9f5;box-sizing:border-box;transition:border-color 0.15s;"/>
+      </div>
+      <button onclick="handleEmailLogin()" style="width:100%;padding:12px;background:#1A1A1A;color:#fcf9f5;border:none;border-radius:8px;font-size:14px;font-weight:600;cursor:pointer;" onmouseover="this.style.opacity='.85'" onmouseout="this.style.opacity='1'">Sign in</button>
+      <p id="login-error" style="font-size:13px;color:#7F1D1D;margin:12px 0 0;display:none;text-align:center;"></p>
+    </div>
+    <p style="font-size:13px;color:#8A857F;text-align:center;margin-top:20px;">Don't have an account? <a href="#" style="color:#8b5112;text-decoration:none;font-weight:500;">Sign up free</a></p>
+  </div>
+</div>
+
+
+<!-- ══════════════════════════════════════════
+     LAYOUT SHELL for sidebar pages
+     (Dashboard, Upload, Analyzing, Results, Analytics)
+══════════════════════════════════════════ -->
+<div id="app-shell" class="page" style="min-height:100vh; width:100%;">
+
+  <!-- ─── Sidebar ─── -->
+  <div class="sidebar">
+    <div style="padding:20px 20px 18px;border-bottom:1px solid #E2DDD8;">
+      <div style="display:flex;align-items:center;gap:8px;">
+        <div style="width:28px;height:28px;background:#1A1A1A;border-radius:6px;display:flex;align-items:center;justify-content:center;">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fcf9f5" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        </div>
+        <span style="font-size:16px;font-weight:800;color:#1A1A1A;letter-spacing:-0.4px;">ResumeIQ</span>
+      </div>
+    </div>
+
+    <nav style="padding:16px 12px;flex:1;">
+      <p style="font-size:10px;font-weight:600;color:#8A857F;letter-spacing:1px;text-transform:uppercase;margin:0 0 8px 4px;">Menu</p>
+      <a class="nav-link" id="nav-dashboard" onclick="showSection('dashboard')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+        Dashboard
+      </a>
+      <a class="nav-link" id="nav-upload" onclick="showSection('upload')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+        New Batch
+      </a>
+      <a class="nav-link" id="nav-analytics" onclick="showSection('analytics')">
+        <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+        Analytics
+      </a>
+    </nav>
+
+    <div style="padding:16px 20px;border-top:1px solid #E2DDD8;">
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div id="user-avatar" style="width:32px;height:32px;background:#f4ede4;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:700;color:#8b5112;">M</div>
+        <div style="overflow:hidden;">
+          <p id="user-name" style="margin:0;font-size:13px;font-weight:600;color:#1A1A1A;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">Mahima</p>
+          <p id="user-email" style="margin:0;font-size:11px;color:#8A857F;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;">mahima@email.com</p>
         </div>
       </div>
     </div>
-  </main>
-</div>
+  </div>
 
-<!-- ─────────────────── PAGE 2: ANALYZING ─────────────────── -->
-<div id="page-analyzing" class="page ml-64 min-h-screen">
-  <main class="p-8 flex flex-col items-center justify-center min-h-screen">
-    <div class="w-full max-w-4xl space-y-12">
-      <div>
-        <span class="text-[0.6875rem] uppercase tracking-[0.15em] text-secondary font-semibold">Current Operation</span>
-        <h2 class="text-3xl font-medium tracking-tighter text-on-surface mt-2">Analyzing Talent Pool</h2>
-      </div>
-      <div class="bg-white rounded-xl p-12 border border-[#E2DDD8] text-center space-y-6">
-        <div class="space-y-3">
-          <p id="progress-label" class="text-on-surface-variant font-medium text-sm tracking-tight">Preparing resumes...</p>
-          <div class="w-full max-w-md mx-auto h-1.5 bg-surface-container-high rounded-full overflow-hidden">
-            <div id="progress-bar" class="h-full bg-secondary rounded-full" style="width: 5%"></div>
-          </div>
-        </div>
-        <div class="flex justify-center items-center space-x-12 pt-4">
-          <div class="text-left">
-            <p class="text-xs uppercase tracking-wider text-on-surface-variant opacity-60">Files</p>
-            <p id="file-total-display" class="text-2xl font-medium text-on-surface">0</p>
-          </div>
-          <div class="h-8 w-px bg-outline-variant/20"></div>
-          <div class="text-left">
-            <p class="text-xs uppercase tracking-wider text-on-surface-variant opacity-60">Status</p>
-            <p class="text-2xl font-medium text-on-surface">Processing</p>
-          </div>
-        </div>
-      </div>
-      <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div class="bg-surface-container-low/50 rounded-lg p-6 border border-outline-variant/10">
-          <div class="flex items-center justify-between mb-4">
-            <span class="material-symbols-outlined text-secondary opacity-40">psychology</span>
-            <span class="text-[0.625rem] font-bold text-secondary uppercase tracking-widest">Active Insight</span>
-          </div>
-          <p class="text-sm leading-relaxed text-on-surface-variant">Cross-referencing skills with stated proficiency levels...</p>
-        </div>
-        <div class="bg-surface-container-low/50 rounded-lg p-6 border border-outline-variant/10">
-          <div class="flex items-center justify-between mb-4">
-            <span class="material-symbols-outlined text-secondary opacity-40">verified_user</span>
-            <span class="text-[0.625rem] font-bold text-secondary uppercase tracking-widest">Validation</span>
-          </div>
-          <p class="text-sm leading-relaxed text-on-surface-variant">Validating employment history against industry benchmarks.</p>
-        </div>
-        <div class="bg-surface-container-low/50 rounded-lg p-6 border border-outline-variant/10">
-          <div class="flex items-center justify-between mb-4">
-            <span class="material-symbols-outlined text-secondary opacity-40">auto_awesome</span>
-            <span class="text-[0.625rem] font-bold text-secondary uppercase tracking-widest">Scoring</span>
-          </div>
-          <p class="text-sm leading-relaxed text-on-surface-variant">Generating match scores and reasoning for each candidate.</p>
-        </div>
-      </div>
-    </div>
-  </main>
-</div>
+  <!-- ─── Main area ─── -->
+  <div class="main-scroll">
 
-<!-- ─────────────────── PAGE 3: RESULTS ─────────────────── -->
-<div id="page-results" class="page ml-64 min-h-screen">
-  <main class="p-8">
-    <header class="flex justify-between items-center w-full h-16 mb-8">
-      <div>
-        <h2 class="text-2xl font-semibold text-[#1A1A1A] tracking-tight">Screening Results</h2>
-        <p id="results-subtitle" class="text-sm text-on-surface-variant"></p>
-      </div>
-      <div class="flex items-center space-x-4">
-        <button onclick="resetApp()" class="px-4 py-2 text-sm font-medium text-[#5f5f59] hover:bg-[#f6f3ee] rounded-lg transition-colors flex items-center gap-2">
-          <span class="material-symbols-outlined text-base">arrow_back</span> New Batch
+    <!-- ══ SECTION: DASHBOARD ══ -->
+    <section id="section-dashboard" style="display:none; padding:36px 32px; max-width:1000px;">
+      <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:32px;">
+        <div>
+          <h1 id="dash-greeting" style="font-size:24px;font-weight:700;color:#1A1A1A;margin:0 0 4px;">Good morning 👋</h1>
+          <p id="dash-date" style="font-size:14px;color:#8A857F;margin:0;"></p>
+        </div>
+        <button onclick="showSection('upload')" style="display:flex;align-items:center;gap:8px;padding:10px 18px;background:#1A1A1A;color:#fcf9f5;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;" onmouseover="this.style.opacity='.8'" onmouseout="this.style.opacity='1'">
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
+          Start New Batch
         </button>
       </div>
-    </header>
 
-    <!-- Stats -->
-    <div class="grid grid-cols-4 gap-4 mb-8">
-      <div class="bg-white p-5 rounded-card border border-[#E2DDD8] flex flex-col">
-        <span class="text-[0.6875rem] uppercase tracking-[0.05em] text-[#8A857F] font-bold mb-1">TOTAL</span>
-        <span id="stat-total" class="text-2xl font-bold text-[#1A1A1A]">0</span>
-      </div>
-      <div class="bg-white p-5 rounded-card border border-[#E2DDD8] flex flex-col">
-        <span class="text-[0.6875rem] uppercase tracking-[0.05em] text-[#8A857F] font-bold mb-1">STRONG</span>
-        <span id="stat-strong" class="text-2xl font-bold text-[#2D6A4F]">0</span>
-      </div>
-      <div class="bg-white p-5 rounded-card border border-[#E2DDD8] flex flex-col">
-        <span class="text-[0.6875rem] uppercase tracking-[0.05em] text-[#8A857F] font-bold mb-1">PARTIAL</span>
-        <span id="stat-partial" class="text-2xl font-bold text-[#92400E]">0</span>
-      </div>
-      <div class="bg-white p-5 rounded-card border border-[#E2DDD8] flex flex-col">
-        <span class="text-[0.6875rem] uppercase tracking-[0.05em] text-[#8A857F] font-bold mb-1">WEAK</span>
-        <span id="stat-weak" class="text-2xl font-bold text-[#7F1D1D]">0</span>
-      </div>
-    </div>
-
-    <!-- Results Table -->
-    <div class="bg-white rounded-card border border-[#E2DDD8] overflow-hidden">
-      <table class="w-full text-left border-collapse">
-        <thead>
-          <tr class="bg-surface-container-low border-b border-[#E2DDD8]">
-            <th class="px-6 py-4 text-[0.6875rem] uppercase tracking-[0.05em] font-bold text-[#8A857F]">Rank</th>
-            <th class="px-6 py-4 text-[0.6875rem] uppercase tracking-[0.05em] font-bold text-[#8A857F]">Candidate</th>
-            <th class="px-6 py-4 text-[0.6875rem] uppercase tracking-[0.05em] font-bold text-[#8A857F]">Score</th>
-            <th class="px-6 py-4 text-[0.6875rem] uppercase tracking-[0.05em] font-bold text-[#8A857F]">AI Reason</th>
-            <th class="px-6 py-4 text-[0.6875rem] uppercase tracking-[0.05em] font-bold text-[#8A857F]">Match</th>
-          </tr>
-        </thead>
-        <tbody id="results-tbody" class="divide-y divide-[#E2DDD8]/50"></tbody>
-      </table>
-      <div class="p-6 bg-surface-container-low flex items-center justify-between">
-        <span id="results-count" class="text-xs text-[#8A857F]"></span>
-        <div class="flex items-center space-x-4">
-          <button onclick="exportCSV()" class="px-5 py-2.5 rounded-btn text-sm font-medium text-[#1A1A1A] hover:bg-[#e4e3da] transition-colors border border-[#E2DDD8]">Export CSV</button>
-          <button class="px-5 py-2.5 rounded-btn text-sm font-semibold bg-[#1A1A1A] text-white hover:bg-black transition-colors">Shortlist top 8</button>
+      <!-- Stat cards -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:28px;">
+        <div class="card" style="padding:20px;">
+          <p style="font-size:11px;color:#8A857F;margin:0 0 8px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Total Batches</p>
+          <p id="stat-batches" style="font-size:28px;font-weight:700;color:#1A1A1A;margin:0 0 4px;">0</p>
+          <p id="stat-batches-sub" style="font-size:12px;color:#8A857F;margin:0;">No batches yet</p>
+        </div>
+        <div class="card" style="padding:20px;">
+          <p style="font-size:11px;color:#8A857F;margin:0 0 8px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Resumes Screened</p>
+          <p id="stat-screened" style="font-size:28px;font-weight:700;color:#1A1A1A;margin:0 0 4px;">0</p>
+          <p id="stat-screened-sub" style="font-size:12px;color:#8A857F;margin:0;">Run a batch to start</p>
+        </div>
+        <div class="card" style="padding:20px;">
+          <p style="font-size:11px;color:#8A857F;margin:0 0 8px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Avg Match Score</p>
+          <p id="stat-avg" style="font-size:28px;font-weight:700;color:#1A1A1A;margin:0 0 4px;">—</p>
+          <p id="stat-avg-sub" style="font-size:12px;color:#8A857F;margin:0;">Across all batches</p>
+        </div>
+        <div class="card" style="padding:20px;">
+          <p style="font-size:11px;color:#8A857F;margin:0 0 8px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Strong Matches</p>
+          <p id="stat-strong" style="font-size:28px;font-weight:700;color:#2D6A4F;margin:0 0 4px;">0</p>
+          <p style="font-size:12px;color:#8A857F;margin:0;">Score ≥ 80</p>
         </div>
       </div>
-    </div>
-  </main>
-</div>
+
+      <!-- Recent batches table -->
+      <div class="card" style="margin-bottom:24px;overflow:hidden;">
+        <div style="padding:18px 20px;border-bottom:1px solid #E2DDD8;display:flex;justify-content:space-between;align-items:center;">
+          <h3 style="font-size:14px;font-weight:600;color:#1A1A1A;margin:0;">Recent Batches</h3>
+          <span style="font-size:12px;color:#8A857F;">Last 5 sessions</span>
+        </div>
+        <div id="recent-batches-body">
+          <div style="padding:40px;text-align:center;color:#8A857F;font-size:14px;">
+            No batches yet. <a onclick="showSection('upload')" style="color:#8b5112;cursor:pointer;font-weight:500;">Start your first batch →</a>
+          </div>
+        </div>
+      </div>
+
+      <!-- Render tip -->
+      <div style="background:#f4ede4;border:1px solid #e8d9c8;border-radius:10px;padding:14px 18px;display:flex;align-items:center;gap:12px;">
+        <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8b5112" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>
+        <p style="font-size:13px;color:#8A857F;margin:0;">Backend tip: Visit <a href="https://resumeiq-kov9.onrender.com/docs" target="_blank" style="color:#8b5112;text-decoration:none;font-weight:500;">resumeiq-kov9.onrender.com/docs</a> to wake Render before running a batch.</p>
+      </div>
+    </section>
+
+    <!-- ══ SECTION: UPLOAD ══ -->
+    <section id="section-upload" style="display:none; padding:36px 32px; max-width:1000px;">
+      <div style="margin-bottom:28px;">
+        <h2 style="font-size:22px;font-weight:700;color:#1A1A1A;margin:0 0 4px;">New Screening Batch</h2>
+        <p style="font-size:14px;color:#8A857F;margin:0;">Paste a job description and upload candidate resumes.</p>
+      </div>
+
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:24px;">
+        <!-- JD -->
+        <div class="card" style="padding:28px;display:flex;flex-direction:column;">
+          <h3 style="font-size:15px;font-weight:600;color:#1A1A1A;margin:0 0 16px;">Job Description</h3>
+          <textarea id="jd-text" style="flex:1;min-height:380px;background:#fcf9f5;border:1px solid #E2DDD8;border-radius:8px;padding:16px;font-size:14px;color:#1A1A1A;resize:none;line-height:1.6;" placeholder="Paste the full job description here. Include required skills, experience, and responsibilities..."></textarea>
+        </div>
+        <!-- Resumes -->
+        <div class="card" style="padding:28px;display:flex;flex-direction:column;">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:16px;">
+            <h3 style="font-size:15px;font-weight:600;color:#1A1A1A;margin:0;">Resumes</h3>
+            <span id="file-count" style="font-size:13px;color:#8A857F;">0 files added</span>
+          </div>
+          <div id="drop-zone" onclick="document.getElementById('resume-input').click()" style="flex:1;min-height:200px;border:2px dashed #E2DDD8;border-radius:8px;display:flex;flex-direction:column;align-items:center;justify-content:center;cursor:pointer;transition:all 0.2s;" onmouseover="this.style.borderColor='#8b5112';this.style.background='#fdf8f3'" onmouseout="this.style.borderColor='#E2DDD8';this.style.background='transparent'">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="#8b5112" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" style="margin-bottom:12px;"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4"/><polyline points="17 8 12 3 7 8"/><line x1="12" y1="3" x2="12" y2="15"/></svg>
+            <p style="font-size:14px;font-weight:500;color:#1A1A1A;margin:0 0 4px;">Drag & drop resumes</p>
+            <p style="font-size:12px;color:#8A857F;margin:0 0 16px;">PDF or DOCX — up to 50 files</p>
+            <span style="padding:8px 16px;background:#1A1A1A;color:#fcf9f5;border-radius:6px;font-size:13px;font-weight:500;">Browse Files</span>
+          </div>
+          <input type="file" id="resume-input" multiple accept=".pdf,.docx,.doc" style="display:none;" onchange="handleFiles(this.files)"/>
+          <div id="file-chips" style="margin-top:12px;display:flex;flex-wrap:wrap;gap:6px;"></div>
+        </div>
+      </div>
+
+      <div id="upload-error" style="display:none;padding:12px 16px;background:#fff1f1;border:1px solid #fca5a5;border-radius:8px;color:#7F1D1D;font-size:14px;margin-bottom:16px;"></div>
+
+      <button onclick="startAnalysis()" style="width:100%;padding:16px;background:#1A1A1A;color:#fcf9f5;border:none;border-radius:10px;font-size:16px;font-weight:600;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:10px;" onmouseover="this.style.background='#333'" onmouseout="this.style.background='#1A1A1A'">
+        Analyze Resumes
+        <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
+      </button>
+    </section>
+
+    <!-- ══ SECTION: ANALYZING ══ -->
+    <section id="section-analyzing" style="display:none; padding:36px 32px; max-width:700px; margin:0 auto;">
+      <div style="margin-bottom:32px;">
+        <p style="font-size:11px;font-weight:600;color:#8b5112;text-transform:uppercase;letter-spacing:1px;margin:0 0 8px;">In Progress</p>
+        <h2 style="font-size:26px;font-weight:700;color:#1A1A1A;margin:0;">Analyzing Talent Pool</h2>
+      </div>
+      <div class="card" style="padding:40px;text-align:center;margin-bottom:24px;">
+        <p id="progress-label" style="font-size:14px;color:#8A857F;margin:0 0 16px;">Preparing resumes...</p>
+        <div style="height:6px;background:#f0eee8;border-radius:4px;overflow:hidden;margin-bottom:24px;">
+          <div id="progress-bar" style="height:100%;background:#8b5112;border-radius:4px;width:5%;"></div>
+        </div>
+        <div style="display:flex;justify-content:center;gap:48px;">
+          <div>
+            <p style="font-size:11px;color:#8A857F;text-transform:uppercase;letter-spacing:0.5px;margin:0 0 4px;">Files</p>
+            <p id="file-total-display" style="font-size:24px;font-weight:700;color:#1A1A1A;margin:0;">0</p>
+          </div>
+          <div style="width:1px;background:#E2DDD8;"></div>
+          <div>
+            <p style="font-size:11px;color:#8A857F;text-transform:uppercase;letter-spacing:0.5px;margin:0 0 4px;">Status</p>
+            <p style="font-size:24px;font-weight:700;color:#1A1A1A;margin:0;">Processing</p>
+          </div>
+        </div>
+      </div>
+      <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:16px;">
+        <div class="card" style="padding:20px;">
+          <p style="font-size:10px;font-weight:700;color:#8b5112;text-transform:uppercase;letter-spacing:1px;margin:0 0 8px;">Parsing</p>
+          <p style="font-size:13px;color:#8A857F;margin:0;line-height:1.5;">Extracting text from PDF and DOCX files...</p>
+        </div>
+        <div class="card" style="padding:20px;">
+          <p style="font-size:10px;font-weight:700;color:#8b5112;text-transform:uppercase;letter-spacing:1px;margin:0 0 8px;">AI Scoring</p>
+          <p style="font-size:13px;color:#8A857F;margin:0;line-height:1.5;">Gemini scoring each resume against the JD...</p>
+        </div>
+        <div class="card" style="padding:20px;">
+          <p style="font-size:10px;font-weight:700;color:#8b5112;text-transform:uppercase;letter-spacing:1px;margin:0 0 8px;">Ranking</p>
+          <p style="font-size:13px;color:#8A857F;margin:0;line-height:1.5;">Sorting candidates by match score...</p>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ SECTION: RESULTS ══ -->
+    <section id="section-results" style="display:none; padding:36px 32px; max-width:1000px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:28px;">
+        <div>
+          <h2 style="font-size:22px;font-weight:700;color:#1A1A1A;margin:0 0 4px;">Screening Results</h2>
+          <p id="results-subtitle" style="font-size:14px;color:#8A857F;margin:0;"></p>
+        </div>
+        <button onclick="resetBatch()" style="display:flex;align-items:center;gap:6px;padding:9px 16px;background:#fff;border:1px solid #E2DDD8;border-radius:8px;font-size:13px;font-weight:500;color:#1A1A1A;cursor:pointer;" onmouseover="this.style.background='#f4ede4'" onmouseout="this.style.background='#fff'">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg>
+          New Batch
+        </button>
+      </div>
+
+      <!-- Summary stats -->
+      <div style="display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-bottom:24px;">
+        <div class="card" style="padding:18px;">
+          <p style="font-size:11px;color:#8A857F;margin:0 0 6px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Total</p>
+          <p id="res-total" style="font-size:26px;font-weight:700;color:#1A1A1A;margin:0;">0</p>
+        </div>
+        <div class="card" style="padding:18px;">
+          <p style="font-size:11px;color:#8A857F;margin:0 0 6px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Strong</p>
+          <p id="res-strong" style="font-size:26px;font-weight:700;color:#2D6A4F;margin:0;">0</p>
+        </div>
+        <div class="card" style="padding:18px;">
+          <p style="font-size:11px;color:#8A857F;margin:0 0 6px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Partial</p>
+          <p id="res-partial" style="font-size:26px;font-weight:700;color:#92400E;margin:0;">0</p>
+        </div>
+        <div class="card" style="padding:18px;">
+          <p style="font-size:11px;color:#8A857F;margin:0 0 6px;font-weight:600;text-transform:uppercase;letter-spacing:0.5px;">Weak</p>
+          <p id="res-weak" style="font-size:26px;font-weight:700;color:#7F1D1D;margin:0;">0</p>
+        </div>
+      </div>
+
+      <!-- Results table -->
+      <div class="card" style="overflow:hidden;">
+        <table style="width:100%;border-collapse:collapse;">
+          <thead>
+            <tr style="background:#fcf9f5;border-bottom:1px solid #E2DDD8;">
+              <th style="padding:12px 20px;text-align:left;font-size:11px;font-weight:600;color:#8A857F;text-transform:uppercase;letter-spacing:0.5px;">Rank</th>
+              <th style="padding:12px 20px;text-align:left;font-size:11px;font-weight:600;color:#8A857F;text-transform:uppercase;letter-spacing:0.5px;">Candidate</th>
+              <th style="padding:12px 20px;text-align:left;font-size:11px;font-weight:600;color:#8A857F;text-transform:uppercase;letter-spacing:0.5px;">Score</th>
+              <th style="padding:12px 20px;text-align:left;font-size:11px;font-weight:600;color:#8A857F;text-transform:uppercase;letter-spacing:0.5px;">AI Reason</th>
+              <th style="padding:12px 20px;text-align:left;font-size:11px;font-weight:600;color:#8A857F;text-transform:uppercase;letter-spacing:0.5px;">Match</th>
+            </tr>
+          </thead>
+          <tbody id="results-tbody"></tbody>
+        </table>
+        <div style="padding:16px 20px;background:#fcf9f5;border-top:1px solid #E2DDD8;display:flex;justify-content:space-between;align-items:center;">
+          <span id="results-count" style="font-size:12px;color:#8A857F;"></span>
+          <button onclick="exportCSV()" style="padding:8px 18px;border:1px solid #E2DDD8;border-radius:8px;background:#fff;font-size:13px;font-weight:500;color:#1A1A1A;cursor:pointer;" onmouseover="this.style.background='#f4ede4'" onmouseout="this.style.background='#fff'">Export CSV</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ══ SECTION: ANALYTICS ══ -->
+    <section id="section-analytics" style="display:none; padding:36px 32px; max-width:1000px;">
+      <div style="margin-bottom:28px;">
+        <h2 style="font-size:22px;font-weight:700;color:#1A1A1A;margin:0 0 4px;">Analytics</h2>
+        <p style="font-size:14px;color:#8A857F;margin:0;">Insights from all your screening sessions</p>
+      </div>
+
+      <!-- No data state -->
+      <div id="analytics-empty" style="display:none;">
+        <div class="card" style="padding:60px;text-align:center;">
+          <svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="#E2DDD8" stroke-width="1.5" style="margin-bottom:16px;"><line x1="18" y1="20" x2="18" y2="10"/><line x1="12" y1="20" x2="12" y2="4"/><line x1="6" y1="20" x2="6" y2="14"/></svg>
+          <p style="font-size:16px;font-weight:600;color:#1A1A1A;margin:0 0 8px;">No data yet</p>
+          <p style="font-size:14px;color:#8A857F;margin:0 0 20px;">Run your first batch to see analytics here.</p>
+          <button onclick="showSection('upload')" style="padding:10px 20px;background:#1A1A1A;color:#fcf9f5;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;">Start New Batch</button>
+        </div>
+      </div>
+
+      <!-- Charts (shown when data exists) -->
+      <div id="analytics-charts" style="display:none;">
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px;margin-bottom:20px;">
+          <div class="card" style="padding:22px;">
+            <h4 style="font-size:14px;font-weight:600;color:#1A1A1A;margin:0 0 4px;">Match Distribution</h4>
+            <p style="font-size:12px;color:#8A857F;margin:0 0 20px;">Across all batches</p>
+            <canvas id="matchDistChart" height="200"></canvas>
+          </div>
+          <div class="card" style="padding:22px;">
+            <h4 style="font-size:14px;font-weight:600;color:#1A1A1A;margin:0 0 4px;">Score Distribution</h4>
+            <p style="font-size:12px;color:#8A857F;margin:0 0 20px;">How candidates scored</p>
+            <canvas id="scoreDistChart" height="200"></canvas>
+          </div>
+        </div>
+        <div class="card" style="padding:22px;margin-bottom:20px;">
+          <h4 style="font-size:14px;font-weight:600;color:#1A1A1A;margin:0 0 4px;">Top Skills in Demand</h4>
+          <p style="font-size:12px;color:#8A857F;margin:0 0 20px;">Most matched skills across all JDs</p>
+          <canvas id="skillsChart" height="160"></canvas>
+        </div>
+        <!-- Batch history in analytics -->
+        <div class="card" style="overflow:hidden;">
+          <div style="padding:16px 20px;border-bottom:1px solid #E2DDD8;">
+            <h4 style="font-size:14px;font-weight:600;color:#1A1A1A;margin:0;">All Batches</h4>
+          </div>
+          <div id="analytics-batch-list"></div>
+        </div>
+      </div>
+    </section>
+
+  </div><!-- end main-scroll -->
+</div><!-- end app-shell -->
+
 
 <script>
-  // ── State ──
-  let uploadedFiles = [];
-  let resultsData = [];
-  // ── File handling ──
-function addFiles(files) {
-    const newFiles = Array.from(files);
-    uploadedFiles = [...uploadedFiles, ...newFiles];
-    handleFiles(uploadedFiles);
+// ══════════════════════════════════════════
+//  STATE
+// ══════════════════════════════════════════
+const state = {
+  user: { name: 'Mahima', email: 'mahima@email.com' },
+  batches: [],      // array of batch objects saved after each analysis
+  currentResults: null,
+  uploadedFiles: [],
+  charts: {},
+};
+
+// ══════════════════════════════════════════
+//  NAVIGATION
+// ══════════════════════════════════════════
+function showPage(pageId) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  const el = document.getElementById(pageId);
+  if (el) el.classList.add('active');
 }
-  function handleFiles(files) {
-    uploadedFiles = Array.isArray(files) ? files : Array.from(files);
-    document.getElementById('file-count').textContent = `${uploadedFiles.length} candidate${uploadedFiles.length !== 1 ? 's' : ''} added`;
-    const chips = document.getElementById('file-chips');
-    chips.innerHTML = '';
-    uploadedFiles.forEach((f, i) => {
-      chips.innerHTML += `
-        <div class="bg-surface-container-low px-3 py-2 rounded-lg flex items-center gap-2 border border-outline-variant/10">
-          <span class="material-symbols-outlined text-sm text-secondary">description</span>
-          <span class="text-xs font-medium truncate max-w-[120px]">${f.name}</span>
-          <button onclick="removeFile(${i})" class="hover:text-error transition-colors">
-            <span class="material-symbols-outlined" style="font-size:14px">close</span>
-          </button>
-        </div>`;
-    });
-  }
 
-  function removeFile(index) {
-    uploadedFiles.splice(index, 1);
-    handleFiles(uploadedFiles);
-  }
+function showSection(name) {
+  // Show app shell
+  showPage('app-shell');
+  // Hide all sections
+  document.querySelectorAll('#app-shell section').forEach(s => s.style.display = 'none');
+  // Show target section
+  const sec = document.getElementById('section-' + name);
+  if (sec) sec.style.display = 'block';
+  // Update nav
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+  const navEl = document.getElementById('nav-' + name);
+  if (navEl) navEl.classList.add('active');
+  // Section-specific init
+  if (name === 'dashboard') renderDashboard();
+  if (name === 'analytics') renderAnalytics();
+}
 
-  // Drag and drop
-  const dropZone = document.getElementById('drop-zone');
-  dropZone.addEventListener('dragover', e => { e.preventDefault(); dropZone.classList.add('border-secondary/50', 'bg-surface-container-low'); });
-  dropZone.addEventListener('dragleave', () => { dropZone.classList.remove('border-secondary/50', 'bg-surface-container-low'); });
-  dropZone.addEventListener('drop', e => {
-    e.preventDefault();
-    dropZone.classList.remove('border-secondary/50', 'bg-surface-container-low');
-    handleFiles(e.dataTransfer.files);
+// ══════════════════════════════════════════
+//  LOGIN
+// ══════════════════════════════════════════
+function handleEmailLogin() {
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-password').value;
+  const err   = document.getElementById('login-error');
+  if (!email || !pass) {
+    err.textContent = 'Please fill in both fields.';
+    err.style.display = 'block';
+    return;
+  }
+  err.style.display = 'none';
+  state.user.name  = email.split('@')[0];
+  state.user.email = email;
+  applyUser();
+  showSection('dashboard');
+}
+
+function handleGoogleLogin() {
+  // Wire up Firebase later — for now demo mode
+  state.user.name  = 'Mahima';
+  state.user.email = 'mahima@gmail.com';
+  applyUser();
+  showSection('dashboard');
+}
+
+function applyUser() {
+  document.getElementById('user-name').textContent  = state.user.name;
+  document.getElementById('user-email').textContent = state.user.email;
+  document.getElementById('user-avatar').textContent = state.user.name.charAt(0).toUpperCase();
+}
+
+// ══════════════════════════════════════════
+//  DASHBOARD
+// ══════════════════════════════════════════
+function renderDashboard() {
+  // Greeting
+  const h = new Date().getHours();
+  const greet = h < 12 ? 'Good morning' : h < 17 ? 'Good afternoon' : 'Good evening';
+  document.getElementById('dash-greeting').textContent = `${greet}, ${state.user.name} 👋`;
+  document.getElementById('dash-date').textContent = new Date().toLocaleDateString('en-GB', { weekday:'long', day:'numeric', month:'long', year:'numeric' });
+
+  // Stats from real batches
+  const total   = state.batches.length;
+  const screened = state.batches.reduce((s, b) => s + b.total, 0);
+  const strong  = state.batches.reduce((s, b) => s + (b.stats.strong || 0), 0);
+  const avgScore = screened === 0 ? null : Math.round(
+    state.batches.flatMap(b => b.results.map(r => r.score)).reduce((a,b)=>a+b,0) /
+    state.batches.flatMap(b => b.results).length
+  );
+
+  document.getElementById('stat-batches').textContent  = total;
+  document.getElementById('stat-screened').textContent = screened;
+  document.getElementById('stat-strong').textContent   = strong;
+  document.getElementById('stat-avg').textContent      = avgScore !== null ? avgScore + '%' : '—';
+  document.getElementById('stat-batches-sub').textContent  = total === 0 ? 'No batches yet' : `${total} batch${total>1?'es':''} run`;
+  document.getElementById('stat-screened-sub').textContent = screened === 0 ? 'Run a batch to start' : `${screened} resume${screened>1?'s':''} total`;
+
+  // Recent batches table
+  const container = document.getElementById('recent-batches-body');
+  if (state.batches.length === 0) {
+    container.innerHTML = `<div style="padding:40px;text-align:center;color:#8A857F;font-size:14px;">No batches yet. <a onclick="showSection('upload')" style="color:#8b5112;cursor:pointer;font-weight:500;">Start your first batch →</a></div>`;
+    return;
+  }
+  const recent = [...state.batches].reverse().slice(0, 5);
+  container.innerHTML = `
+    <table style="width:100%;border-collapse:collapse;">
+      <thead><tr style="background:#fcf9f5;">
+        <th style="padding:10px 20px;text-align:left;font-size:11px;font-weight:600;color:#8A857F;text-transform:uppercase;letter-spacing:0.5px;">Role / JD Snippet</th>
+        <th style="padding:10px 16px;text-align:center;font-size:11px;font-weight:600;color:#8A857F;text-transform:uppercase;letter-spacing:0.5px;">Resumes</th>
+        <th style="padding:10px 16px;text-align:center;font-size:11px;font-weight:600;color:#8A857F;text-transform:uppercase;letter-spacing:0.5px;">Avg Score</th>
+        <th style="padding:10px 16px;text-align:center;font-size:11px;font-weight:600;color:#8A857F;text-transform:uppercase;letter-spacing:0.5px;">Top Match</th>
+        <th style="padding:10px 16px;text-align:center;font-size:11px;font-weight:600;color:#8A857F;text-transform:uppercase;letter-spacing:0.5px;">Date</th>
+      </tr></thead>
+      <tbody>
+        ${recent.map(b => {
+          const avg = Math.round(b.results.reduce((s,r)=>s+r.score,0)/b.results.length);
+          const scoreColor = avg>=80?'#2D6A4F':avg>=55?'#92400E':'#7F1D1D';
+          const top = b.results[0];
+          const badgeClass = top.match_level==='Strong'?'badge-strong':top.match_level==='Good'?'badge-good':top.match_level==='Partial'?'badge-partial':'badge-weak';
+          return `<tr style="border-top:1px solid #E2DDD8;" class="alt-row">
+            <td style="padding:12px 20px;font-size:13px;color:#1A1A1A;font-weight:500;max-width:200px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${b.jdSnippet}</td>
+            <td style="padding:12px 16px;text-align:center;font-size:13px;color:#8A857F;">${b.total}</td>
+            <td style="padding:12px 16px;text-align:center;"><span style="font-size:13px;font-weight:600;color:${scoreColor};">${avg}%</span></td>
+            <td style="padding:12px 16px;text-align:center;"><span style="font-size:12px;padding:3px 8px;border-radius:20px;font-weight:500;" class="${badgeClass}">${top.match_level}</span></td>
+            <td style="padding:12px 16px;text-align:center;font-size:12px;color:#8A857F;">${b.date}</td>
+          </tr>`;
+        }).join('')}
+      </tbody>
+    </table>`;
+}
+
+// ══════════════════════════════════════════
+//  FILE UPLOAD
+// ══════════════════════════════════════════
+function handleFiles(files) {
+  state.uploadedFiles = Array.from(files);
+  document.getElementById('file-count').textContent = `${state.uploadedFiles.length} file${state.uploadedFiles.length!==1?'s':''} added`;
+  const chips = document.getElementById('file-chips');
+  chips.innerHTML = '';
+  state.uploadedFiles.forEach((f, i) => {
+    chips.innerHTML += `<div style="display:flex;align-items:center;gap:6px;padding:5px 10px;background:#f4ede4;border-radius:6px;font-size:12px;color:#8b5112;font-weight:500;">
+      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+      <span style="max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${f.name}</span>
+      <span onclick="removeFile(${i})" style="cursor:pointer;color:#92400E;font-size:14px;line-height:1;">×</span>
+    </div>`;
+  });
+}
+function removeFile(i) {
+  state.uploadedFiles.splice(i, 1);
+  handleFiles(state.uploadedFiles);
+}
+
+// Drag & drop
+document.addEventListener('DOMContentLoaded', () => {
+  const dz = document.getElementById('drop-zone');
+  dz.addEventListener('dragover', e => { e.preventDefault(); dz.style.borderColor='#8b5112'; dz.style.background='#fdf8f3'; });
+  dz.addEventListener('dragleave', () => { dz.style.borderColor='#E2DDD8'; dz.style.background='transparent'; });
+  dz.addEventListener('drop', e => { e.preventDefault(); dz.style.borderColor='#E2DDD8'; dz.style.background='transparent'; handleFiles(e.dataTransfer.files); });
+});
+
+// ══════════════════════════════════════════
+//  ANALYSIS
+// ══════════════════════════════════════════
+async function startAnalysis() {
+  const jd  = document.getElementById('jd-text').value.trim();
+  const err = document.getElementById('upload-error');
+  err.style.display = 'none';
+
+  if (!jd)                          { err.textContent='Please paste a job description.'; err.style.display='block'; return; }
+  if (state.uploadedFiles.length===0){ err.textContent='Please upload at least one resume.'; err.style.display='block'; return; }
+
+  document.getElementById('file-total-display').textContent = state.uploadedFiles.length;
+  showSection('analyzing');
+
+  // Progress animation
+  let pct = 5;
+  const bar   = document.getElementById('progress-bar');
+  const label = document.getElementById('progress-label');
+  const timer = setInterval(() => {
+    if (pct < 85) {
+      pct += Math.random() * 8;
+      bar.style.width = Math.min(pct, 85) + '%';
+      if (pct > 30) label.textContent = 'Extracting resume text...';
+      if (pct > 55) label.textContent = 'Scoring with Gemini AI...';
+      if (pct > 75) label.textContent = 'Ranking candidates...';
+    }
+  }, 800);
+
+  const formData = new FormData();
+  formData.append('jd_text', jd);
+  state.uploadedFiles.forEach(f => formData.append('resumes', f));
+
+  try {
+    const res = await fetch('https://resumeiq-kov9.onrender.com/analyze', { method:'POST', body:formData });
+    clearInterval(timer);
+    bar.style.width = '100%';
+    label.textContent = 'Done! Loading results...';
+
+    if (!res.ok) { const e = await res.json(); throw new Error(e.detail || 'Server error'); }
+    const data = await res.json();
+
+    // Save batch to state memory
+    const batch = {
+      id: Date.now(),
+      date: new Date().toLocaleDateString('en-GB', { day:'numeric', month:'short', year:'numeric' }),
+      jdSnippet: jd.slice(0, 50).trim() + (jd.length > 50 ? '…' : ''),
+      total:   data.total,
+      stats:   data.stats,
+      results: data.results,
+    };
+    state.batches.push(batch);
+    state.currentResults = batch;
+
+    setTimeout(() => renderResults(batch), 500);
+  } catch(e) {
+    clearInterval(timer);
+    showSection('upload');
+    document.getElementById('upload-error').textContent = `Error: ${e.message}`;
+    document.getElementById('upload-error').style.display = 'block';
+  }
+}
+
+// ══════════════════════════════════════════
+//  RESULTS
+// ══════════════════════════════════════════
+function renderResults(batch) {
+  document.getElementById('res-total').textContent   = batch.total;
+  document.getElementById('res-strong').textContent  = batch.stats.strong  || 0;
+  document.getElementById('res-partial').textContent = (batch.stats.partial||0) + (batch.stats.good||0);
+  document.getElementById('res-weak').textContent    = batch.stats.weak    || 0;
+  document.getElementById('results-subtitle').textContent = `${batch.total} candidates scored · ${batch.date}`;
+  document.getElementById('results-count').textContent    = `Showing all ${batch.total} candidates`;
+
+  const tbody = document.getElementById('results-tbody');
+  tbody.innerHTML = '';
+  batch.results.forEach((r, i) => {
+    const score = r.score || 0;
+    const sc = score>=80?'#2D6A4F':score>=55?'#92400E':'#7F1D1D';
+    const badgeClass = score>=80?'badge-strong':score>=55?'badge-good':score>=40?'badge-partial':'badge-weak';
+    const borderLeft = i < 3 ? 'border-left:4px solid #C17D3C;' : '';
+    tbody.innerHTML += `<tr class="alt-row" style="${borderLeft}border-top:1px solid #E2DDD8;">
+      <td style="padding:14px 20px;"><span style="font-size:16px;font-weight:700;color:${i<3?'#1A1A1A':'#8A857F'};">${String(r.rank).padStart(2,'0')}</span></td>
+      <td style="padding:14px 20px;">
+        <div style="font-size:13px;font-weight:600;color:#1A1A1A;">${r.candidate_name}</div>
+        <div style="font-size:12px;color:#8A857F;margin-top:2px;">${r.experience_summary}</div>
+      </td>
+      <td style="padding:14px 20px;">
+        <div style="display:flex;align-items:center;gap:10px;width:120px;">
+          <div style="flex:1;height:5px;background:#f0eee8;border-radius:3px;overflow:hidden;"><div style="height:100%;width:${score}%;background:${sc};border-radius:3px;"></div></div>
+          <span style="font-size:13px;font-weight:700;color:${sc};">${score}</span>
+        </div>
+      </td>
+      <td style="padding:14px 20px;max-width:300px;"><p style="font-size:12px;color:#5f5f59;line-height:1.5;margin:0;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;">${r.reason}</p></td>
+      <td style="padding:14px 20px;"><span style="font-size:11px;font-weight:600;padding:4px 10px;border-radius:20px;text-transform:uppercase;letter-spacing:0.5px;" class="${badgeClass}">${r.match_level}</span></td>
+    </tr>`;
+  });
+  showSection('results');
+  // update nav to highlight nothing (results isn't in nav)
+  document.querySelectorAll('.nav-link').forEach(l => l.classList.remove('active'));
+}
+
+function resetBatch() {
+  state.uploadedFiles = [];
+  document.getElementById('jd-text').value = '';
+  document.getElementById('file-chips').innerHTML = '';
+  document.getElementById('file-count').textContent = '0 files added';
+  document.getElementById('upload-error').style.display = 'none';
+  document.getElementById('progress-bar').style.width = '5%';
+  showSection('upload');
+}
+
+function exportCSV() {
+  const data = state.currentResults;
+  if (!data) return;
+  const headers = ['Rank','Candidate','Experience','Score','Match Level','Reason','Matched Skills','Missing Skills'];
+  const rows = data.results.map(r => [
+    r.rank, r.candidate_name, r.experience_summary, r.score,
+    r.match_level, `"${r.reason}"`,
+    `"${(r.matched_skills||[]).join(', ')}"`,
+    `"${(r.missing_skills||[]).join(', ')}"`
+  ]);
+  const csv = [headers,...rows].map(r=>r.join(',')).join('\n');
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(new Blob([csv],{type:'text/csv'}));
+  a.download = 'resumeiq_results.csv';
+  a.click();
+}
+
+// ══════════════════════════════════════════
+//  ANALYTICS
+// ══════════════════════════════════════════
+function renderAnalytics() {
+  if (state.batches.length === 0) {
+    document.getElementById('analytics-empty').style.display  = 'block';
+    document.getElementById('analytics-charts').style.display = 'none';
+    return;
+  }
+  document.getElementById('analytics-empty').style.display  = 'none';
+  document.getElementById('analytics-charts').style.display = 'block';
+
+  // Aggregate data
+  const allResults = state.batches.flatMap(b => b.results);
+  const strong  = allResults.filter(r=>r.score>=80).length;
+  const good    = allResults.filter(r=>r.score>=55&&r.score<80).length;
+  const partial = allResults.filter(r=>r.score>=35&&r.score<55).length;
+  const weak    = allResults.filter(r=>r.score<35).length;
+
+  const scoreRanges = [
+    allResults.filter(r=>r.score<=20).length,
+    allResults.filter(r=>r.score>20&&r.score<=40).length,
+    allResults.filter(r=>r.score>40&&r.score<=60).length,
+    allResults.filter(r=>r.score>60&&r.score<=80).length,
+    allResults.filter(r=>r.score>80).length,
+  ];
+
+  // Skills from matched_skills
+  const skillCount = {};
+  allResults.forEach(r => (r.matched_skills||[]).forEach(s => { skillCount[s] = (skillCount[s]||0)+1; }));
+  const topSkills = Object.entries(skillCount).sort((a,b)=>b[1]-a[1]).slice(0,8);
+
+  // Destroy old charts
+  ['matchDistChart','scoreDistChart','skillsChart'].forEach(id => {
+    if (state.charts[id]) { state.charts[id].destroy(); delete state.charts[id]; }
   });
 
-  // ── Page navigation ──
-  function showPage(name) {
-    document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
-    document.getElementById(`page-${name}`).classList.add('active');
-  }
+  // Match dist chart
+  state.charts['matchDistChart'] = new Chart(document.getElementById('matchDistChart'), {
+    type:'bar',
+    data:{ labels:['Strong','Good','Partial','Weak'], datasets:[{ data:[strong,good,partial,weak], backgroundColor:['#2D6A4F','#C17D3C','#92400E','#7F1D1D'], borderRadius:6, borderSkipped:false }] },
+    options:{ plugins:{legend:{display:false}}, scales:{ x:{grid:{display:false},ticks:{font:{family:'Inter',size:12},color:'#8A857F'}}, y:{grid:{color:'#F0EBE5'},ticks:{font:{family:'Inter',size:11},color:'#8A857F'},beginAtZero:true} }, responsive:true, maintainAspectRatio:true }
+  });
 
-  // ── Start analysis ──
-  async function startAnalysis() {
-    const jdText = document.getElementById('jd-text').value.trim();
-    const errorEl = document.getElementById('upload-error');
-    errorEl.classList.add('hidden');
+  // Score dist
+  state.charts['scoreDistChart'] = new Chart(document.getElementById('scoreDistChart'), {
+    type:'bar',
+    data:{ labels:['0–20','21–40','41–60','61–80','81–100'], datasets:[{ data:scoreRanges, backgroundColor:['#7F1D1D','#92400E','#C17D3C','#8b5112','#2D6A4F'], borderRadius:6, borderSkipped:false }] },
+    options:{ plugins:{legend:{display:false}}, scales:{ x:{grid:{display:false},ticks:{font:{family:'Inter',size:12},color:'#8A857F'}}, y:{grid:{color:'#F0EBE5'},ticks:{font:{family:'Inter',size:11},color:'#8A857F'},beginAtZero:true} }, responsive:true, maintainAspectRatio:true }
+  });
 
-    if (!jdText) { errorEl.textContent = 'Please paste a job description.'; errorEl.classList.remove('hidden'); return; }
-    if (uploadedFiles.length === 0) { errorEl.textContent = 'Please upload at least one resume.'; errorEl.classList.remove('hidden'); return; }
-
-    // Show analyzing page
-    document.getElementById('file-total-display').textContent = uploadedFiles.length;
-    showPage('analyzing');
-
-    // Animate progress bar
-    let progress = 5;
-    const progressBar = document.getElementById('progress-bar');
-    const progressLabel = document.getElementById('progress-label');
-    const interval = setInterval(() => {
-      if (progress < 85) {
-        progress += Math.random() * 8;
-        progressBar.style.width = Math.min(progress, 85) + '%';
-        if (progress > 30) progressLabel.textContent = 'Extracting resume text...';
-        if (progress > 55) progressLabel.textContent = 'Scoring with Gemini AI...';
-        if (progress > 75) progressLabel.textContent = 'Ranking candidates...';
-      }
-    }, 800);
-
-    // Build form data
-    const formData = new FormData();
-    formData.append('jd_text', jdText);
-    uploadedFiles.forEach(f => formData.append('resumes', f));
-
-    try {
-      const response = await fetch('https://resumeiq-kov9.onrender.com/analyze', {
-        method: 'POST',
-        body: formData
-      });
-
-      clearInterval(interval);
-      progressBar.style.width = '100%';
-      progressLabel.textContent = 'Done! Loading results...';
-
-      if (!response.ok) {
-        const err = await response.json();
-        throw new Error(err.detail || 'Server error');
-      }
-
-      const data = await response.json();
-      resultsData = data.results;
-
-      setTimeout(() => renderResults(data), 600);
-
-    } catch (err) {
-      clearInterval(interval);
-      showPage('upload');
-      document.getElementById('upload-error').textContent = `Error: ${err.message}. Make sure your backend is running at https://resumeiq-kov9.onrender.com`;
-      document.getElementById('upload-error').classList.remove('hidden');
-    }
-  }
-
-  // ── Render results ──
-  function renderResults(data) {
-    // Stats
-    document.getElementById('stat-total').textContent = data.total;
-    document.getElementById('stat-strong').textContent = data.stats.strong;
-    document.getElementById('stat-partial').textContent = (data.stats.partial + data.stats.good);
-    document.getElementById('stat-weak').textContent = data.stats.weak;
-    document.getElementById('results-subtitle').textContent = `${data.total} candidates scored`;
-    document.getElementById('results-count').textContent = `Showing all ${data.total} candidates`;
-
-    // Table rows
-    const tbody = document.getElementById('results-tbody');
-    tbody.innerHTML = '';
-    data.results.forEach((r, i) => {
-      const isTop3 = i < 3;
-      const score = r.score || 0;
-      const scoreColor = score >= 80 ? '#2D6A4F' : score >= 55 ? '#92400E' : '#7F1D1D';
-      const badgeStyle = score >= 80
-        ? 'bg-[#2D6A4F]/10 text-[#2D6A4F]'
-        : score >= 55 ? 'bg-[#92400E]/10 text-[#92400E]' : 'bg-[#7F1D1D]/10 text-[#7F1D1D]';
-      const borderClass = isTop3 ? 'border-l-4 border-[#C17D3C]' : '';
-      const rankColor = isTop3 ? '#1A1A1A' : '#5f5f59';
-
-      tbody.innerHTML += `
-        <tr class="alternate-row ${borderClass}">
-          <td class="px-6 py-5 align-top">
-            <span class="text-lg font-bold" style="color:${rankColor}">${String(r.rank).padStart(2,'0')}</span>
-          </td>
-          <td class="px-6 py-5">
-            <div class="flex flex-col">
-              <span class="text-sm font-semibold text-[#1A1A1A]">${r.candidate_name}</span>
-              <span class="text-xs text-[#8A857F] mt-0.5">${r.experience_summary}</span>
-            </div>
-          </td>
-          <td class="px-6 py-5">
-            <div class="flex items-center space-x-3 w-32">
-              <div class="flex-1 h-1.5 bg-[#f0eee8] rounded-full overflow-hidden">
-                <div class="h-full rounded-full" style="width:${score}%;background:${scoreColor}"></div>
-              </div>
-              <span class="text-sm font-bold" style="color:${scoreColor}">${score}</span>
-            </div>
-          </td>
-          <td class="px-6 py-5 align-top max-w-md">
-            <p class="text-xs text-[#5f5f59] leading-relaxed line-clamp-2">${r.reason}</p>
-          </td>
-          <td class="px-6 py-5">
-            <span class="inline-flex px-2.5 py-1 rounded-full text-[0.65rem] font-bold uppercase tracking-wider ${badgeStyle}">${r.match_level}</span>
-          </td>
-        </tr>`;
+  // Skills
+  if (topSkills.length > 0) {
+    state.charts['skillsChart'] = new Chart(document.getElementById('skillsChart'), {
+      type:'bar',
+      data:{ labels:topSkills.map(s=>s[0]), datasets:[{ data:topSkills.map(s=>s[1]), backgroundColor:'#8b5112', borderRadius:4, borderSkipped:false }] },
+      options:{ indexAxis:'y', plugins:{legend:{display:false}}, scales:{ x:{grid:{color:'#F0EBE5'},ticks:{font:{family:'Inter',size:11},color:'#8A857F'},beginAtZero:true}, y:{grid:{display:false},ticks:{font:{family:'Inter',size:12},color:'#1A1A1A'}} }, responsive:true, maintainAspectRatio:true }
     });
-
-    showPage('results');
   }
 
-  // ── Export CSV ──
-  function exportCSV() {
-    if (!resultsData.length) return;
-    const headers = ['Rank','Candidate','Experience','Score','Match Level','Reason','Matched Skills','Missing Skills'];
-    const rows = resultsData.map(r => [
-      r.rank, r.candidate_name, r.experience_summary, r.score,
-      r.match_level, `"${r.reason}"`,
-      `"${(r.matched_skills||[]).join(', ')}"`,
-      `"${(r.missing_skills||[]).join(', ')}"`
-    ]);
-    const csv = [headers, ...rows].map(r => r.join(',')).join('\n');
-    const blob = new Blob([csv], { type: 'text/csv' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url; a.download = 'resumeiq_results.csv'; a.click();
-    URL.revokeObjectURL(url);
-  }
-
-  // ── Reset ──
-  function resetApp() {
-    uploadedFiles = [];
-    resultsData = [];
-    document.getElementById('jd-text').value = '';
-    document.getElementById('file-chips').innerHTML = '';
-    document.getElementById('file-count').textContent = '0 candidates added';
-    document.getElementById('upload-error').classList.add('hidden');
-    document.getElementById('progress-bar').style.width = '5%';
-    showPage('upload');
-  }
+  // Batch list
+  const list = document.getElementById('analytics-batch-list');
+  list.innerHTML = [...state.batches].reverse().map(b => {
+    const avg = Math.round(b.results.reduce((s,r)=>s+r.score,0)/b.results.length);
+    const sc = avg>=80?'#2D6A4F':avg>=55?'#92400E':'#7F1D1D';
+    return `<div style="padding:14px 20px;border-top:1px solid #E2DDD8;display:flex;justify-content:space-between;align-items:center;">
+      <div>
+        <p style="font-size:13px;font-weight:600;color:#1A1A1A;margin:0 0 2px;">${b.jdSnippet}</p>
+        <p style="font-size:12px;color:#8A857F;margin:0;">${b.total} resumes · ${b.date}</p>
+      </div>
+      <span style="font-size:15px;font-weight:700;color:${sc};">${avg}%</span>
+    </div>`;
+  }).join('');
+}
 </script>
 </body>
 </html>
